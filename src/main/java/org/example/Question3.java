@@ -1,34 +1,49 @@
 package org.example;
 
-import java.io.FileNotFoundException;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
-/**
- *  Name:
- *  Class Group:
- */
-public class Question3  {   //Nested HTML (Stack)
+public class Question3 {
 
-    /*
-filename: name of the file to test.
-*/
-    public static boolean validate(String filename) throws FileNotFoundException
-    {
-        return false;
+    // This function checks if the HTML tags in the file are properly nested.
+    public static boolean validate(String filename) throws FileNotFoundException {
+        // Stack to store opening tags
+        Stack<String> stack = new Stack<>();
+        // Read the file
+        File file = new File(filename);
+        Scanner scanner = new Scanner(file);
+
+        while (scanner.hasNext()) {
+            String tag = scanner.next();  // Read the next tag
+            // Check if the tag is an opening tag
+            if (tag.startsWith("<") && !tag.startsWith("</") && !tag.equals("<br>")) {
+                stack.push(tag);  // Push opening tag to the stack
+            }
+            // Check if the tag is a closing tag
+            else if (tag.startsWith("</")) {
+                // If stack is empty or tags don't match, it's invalid
+                if (stack.isEmpty() || !stack.peek().equals(tag.replace("</", "<"))) {
+                    scanner.close();
+                    return false;
+                }
+                stack.pop();  // Pop the matching opening tag from the stack
+            }
+            // Handle <br> tag (self-closing)
+            else if (tag.equals("<br>")) {
+                continue;  // No action required for <br> tags
+            }
+        }
+        scanner.close();
+        // If the stack is empty, all tags were matched properly
+        return stack.isEmpty();
     }
 
-    /*
-        This function tests the files in the files array to see if
-         they are valid.
-         tags_valid.txt should return true;
-         tags_invalid.txt should output as invalid;
-
-
-     */
     public static void main(String[] args) throws FileNotFoundException {
-        String[] files = {"tags_valid.txt", "tags_invalid.txt"};
-        for(String fName: files) {
-            System.out.print(fName +": ");
+        // Files to test
+        String[] files = {"tags_valid.txt", "tags_in" +
+                "valid.txt"};
+        for (String fName : files) {
+            System.out.print(fName + ": ");
             if (validate(fName)) {
                 System.out.println("This file is valid");
             } else {
@@ -36,9 +51,5 @@ filename: name of the file to test.
             }
         }
     }
-
-
-
 }
-
 
